@@ -1,0 +1,63 @@
+version: "3.0"
+
+services:
+  redis:
+    image: redis:7.0
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+
+  scalable_server:
+    container_name: builder
+    image: scalable_server
+    command: [ 'echo', 'build completed' ]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+
+  node1:
+    image: scalable_server
+    container_name: node1
+    hostname: node1
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - "./src:/app/src"
+
+  node2:
+    container_name: node2
+    hostname: node2
+    image: scalable_server
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - "./src:/app/src"
+
+  node3:
+    container_name: node3
+    hostname: node3
+    image: scalable_server
+    env_file:
+      - .env
+    volumes:
+      - "./src:/app/src"
+
+  node_client:
+    container_name: node_client
+    image: scalable_server
+    command: ["/app/node_modules/.bin/ts-node", "/app/test/client-test.ts"]
+    depends_on:
+      - node1
+      - node2
+      - node3
+    env_file:
+      - .env
+    volumes:
+      - "./test:/app/test"
