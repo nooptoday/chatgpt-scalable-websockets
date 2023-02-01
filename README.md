@@ -11,4 +11,9 @@ src directory contains edited code. Full article here:
 - Run `docker-compose up`
 - It creates 3 server instances with hostnames: node1, node2 and node3
 - node_client container connects websockets to node1 server initially, and clients are redirected to correct servers.
-- 
+
+### What is missing?
+
+Clients connect to node1 instance first, then re-balance through other nodes. However, they should connect to a load balancer address initially instead of a server directly.
+
+You are welcome to open up a PR and create a load balancer!
